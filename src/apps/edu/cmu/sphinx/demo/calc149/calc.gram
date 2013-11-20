@@ -1,0 +1,44 @@
+#JSGF V1.0;
+
+/**
+ * JSGF Grammar for Hello World example
+ */
+
+grammar calc;
+
+<unit>  = (zero | one | two | three | four | five | six | seven | eight | nine);
+
+<unitten> = (eleven | twelve | thirteen | fourteen | fifteen | sixteen | seventeen |
+           eighteen | nineteen);
+
+<ten> = (ten | twenty | thirty | forty | fifty | sixty | seventy | eighty | ninety );
+
+<suffix> = (hundred | hundreds | thousand | thousands);
+
+<num> = ( <unit>+ |
+          <unitten> |
+          <ten> |
+          <unit> <suffix> | <unitten> <suffix> | <ten> <suffix> | <ten> <unit> <suffix> );
+      
+<var> = x | y | z;
+
+<number> = <num>+;
+
+<operand>  = <number> | <var>;
+
+public <define> = define variable <var>;
+
+public <store>  = store <var> <number>;
+
+public <store2>  = store last result;
+
+public <retrieve> = retrieve last result; 
+
+<operator> = (plus | minus | over | times);
+
+public <operation>  = <operand> <operator> <operand>;
+
+/*
+public <result> = (<operation> | <number> | <var> | <operator>);
+public <result>  = <operation> | <define> | <store> | <store2> | <retrieve>  ;
+*/
