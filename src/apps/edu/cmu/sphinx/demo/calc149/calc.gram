@@ -19,12 +19,12 @@ grammar calc;
           <unitten> |
           <ten> |
           <unit> <suffix> | <unitten> <suffix> | <ten> <suffix> | <ten> <unit> <suffix> );
-      
+
 <var> = x | y | z;
 
 <number> = <num>+;
 
-<operand>  = <number> | <var>;
+<operand>  = (<number> | <var>) [ square | squared ];
 
 public <define> = define variable <var>;
 
@@ -32,7 +32,7 @@ public <store>  = store <var> <number>;
 
 public <store2>  = store last result;
 
-public <retrieve> = retrieve last result; 
+public <retrieve> = retrieve last result;
 
 <operator> = (plus | minus | over | times);
 

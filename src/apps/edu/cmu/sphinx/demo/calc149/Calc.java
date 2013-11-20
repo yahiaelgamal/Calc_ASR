@@ -182,8 +182,13 @@ public class Calc{
     }
 
     private double buildNumber(String str) {
-        String resArr[] = str.split(" ");
         // TODO remove ANDs
+        int squareIndex = str.indexOf("square");
+        if(squareIndex != -1) {
+        	str =  str.substring(0, squareIndex).trim();
+        }
+
+        String resArr[] = str.split(" ");
         boolean allDigits = true;
         for(String s : resArr){
             if(!isDigit(s)) {
@@ -202,7 +207,10 @@ public class Calc{
         }else {
             number = handleWithSuffix(resArr);
         }
-        return number;
+        if(squareIndex == -1)
+	        return number;
+        else
+	        return number * number;
     }
 
     private double handleWithSuffix(String[] resArr) {
@@ -381,7 +389,7 @@ public class Calc{
     public static void main(String[] args) throws IOException {
         Calc calc = new Calc();
         while(true) {
-            calc.listenOnce(true);
+            calc.listenOnce();
             System.out.println(calc);
         }
 //      calc.stop();
