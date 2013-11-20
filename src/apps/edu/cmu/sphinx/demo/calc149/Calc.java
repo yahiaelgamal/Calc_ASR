@@ -182,13 +182,13 @@ public class Calc{
     }
 
     private double buildNumber(String str) {
-        // TODO remove ANDs
         int squareIndex = str.indexOf("square");
         if(squareIndex != -1) {
-        	str =  str.substring(0, squareIndex).trim();
+            str =  str.substring(0, squareIndex).trim();
         }
 
         String resArr[] = str.split(" ");
+        resArr = removeAnds(resArr);
         boolean allDigits = true;
         for(String s : resArr){
             if(!isDigit(s)) {
@@ -208,9 +208,9 @@ public class Calc{
             number = handleWithSuffix(resArr);
         }
         if(squareIndex == -1)
-	        return number;
+            return number;
         else
-	        return number * number;
+            return number * number;
     }
 
     private double handleWithSuffix(String[] resArr) {
@@ -395,4 +395,21 @@ public class Calc{
 //      calc.stop();
     }
 
+    public static String[] removeAnds(String[] arr) {
+        int andCount = 0;
+        for(String s : arr) {
+            if(s.equals("and"))
+                andCount +=1;
+        }
+
+        String[] newArr = new String[arr.length-andCount];
+        int lastIndex = 0;
+        for(int i = 0; i < arr.length; i++) {
+            if(!arr[i].equals("and")) {
+                newArr[lastIndex] = arr[i];
+                lastIndex += 1;
+            }
+        }
+        return newArr;
+    }
 }

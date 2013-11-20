@@ -15,14 +15,17 @@ grammar calc;
 
 <suffix> = (hundred | hundreds | thousand | thousands);
 
-<num> = ( <unit>+ |
-          <unitten> |
-          <ten> |
-          <unit> <suffix> | <unitten> <suffix> | <ten> <suffix> | <ten> <unit> <suffix> );
+<singular> = <unit> | <unitten> | <ten> | (<ten> <unit>);
+
+<dumbnum>  = (<singular> <suffix> <singular> <suffix> and <singular>) |
+             (<singular> <suffix> <singular> <suffix>) |
+             (<singular> <suffix> and <singular>) |
+             (<singular> <suffix>) |
+             <singular>;
+
+<number> = <dumbnum> | <unit>+;
 
 <var> = x | y | z;
-
-<number> = <num>+;
 
 <operand>  = (<number> | <var>) [ square | squared ];
 
@@ -37,8 +40,3 @@ public <retrieve> = retrieve last result;
 <operator> = (plus | minus | over | times);
 
 public <operation>  = <operand> <operator> <operand>;
-
-/*
-public <result> = (<operation> | <number> | <var> | <operator>);
-public <result>  = <operation> | <define> | <store> | <store2> | <retrieve>  ;
-*/
