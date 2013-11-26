@@ -38,5 +38,7 @@ public <store2>  = store last result;
 public <retrieve> = retrieve last result;
 
 <operator> = (plus | minus | over | times);
+<operator2> = (log | sine | cos);
 
 public <operation>  = <operand> <operator> <operand>;
+public <operation2>  = <operator2> <operand>;

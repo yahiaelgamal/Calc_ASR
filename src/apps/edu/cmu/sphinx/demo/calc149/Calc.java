@@ -101,6 +101,8 @@ public class Calc{
         this.recognizedString = s;
         String operation = getOperation(s);
         this.operation =  operation;
+        String[] operations = {"plus", "minus", "times", "over", "log", "sin", "cos"};
+        Arrays.sort(operations);
 
         if(operation.equals("store")) {
             handleStore(s);
@@ -108,9 +110,10 @@ public class Calc{
             handleDefine(s);
         } else if(operation.equals("retrieve")) {
             handleRetrieve(s);
-        } else if(operation.equals("plus") || operation.equals("minus")
-                || operation.equals("times") || operation.equals("over")) {
+        } else if(Arrays.binarySearch(operations, operation) >= 0) {
             handleOperation(s);
+        } else if(operation.equals("retrieve")) {
+            handleRetrieve(s);
         } else {
             System.err.println("No operation caught");
         }
@@ -142,7 +145,11 @@ public class Calc{
     }
 
     private void handleOperation(String s) {
-        String[] sarr = s.split("(plus|minus|over|times)");
+        String[] sarr = s.split("\\s*(plus|minus|over|times|log|sine|cos)\\s*");
+        System.out.println(Arrays.toString(sarr));
+        if(sarr[0].equals("")) // speical case of <operator> <operand>
+            sarr  = new String[] {sarr[1]};
+
         String[] newarr = new String[sarr.length];
         for(int i = 0; i < sarr.length; i++) {
             newarr[i] = buildNumber(sarr[i].trim()) + "";
@@ -159,10 +166,12 @@ public class Calc{
         else
             op1 = vars.get(this.operands[0]);
 
-        if(isDoubleParsable(this.operands[1]))
-            op2 = Double.parseDouble(this.operands[1]);
-        else
-            op2 = vars.get(this.operands[1]);
+        if(!operation.equals("log") && operation.equals("sin") && operation.equals("cos")) {
+            if(isDoubleParsable(this.operands[1]))
+                op2 = Double.parseDouble(this.operands[1]);
+            else
+                op2 = vars.get(this.operands[1]);
+        }
 
         if(this.operation.equals("plus"))
             this.result = (op1 + op2) + "";
@@ -172,6 +181,12 @@ public class Calc{
             this.result = (op1 * op2) + "";
         else if(this.operation.equals("over"))
             this.result = (op1 / op2) + "";
+        else if(this.operation.equals("log"))
+            this.result = Math.log(op1) + "";
+        else if(this.operation.equals("cos"))
+            this.result = Math.cos(op1) + "";
+        else if(this.operation.equals("sin"))
+            this.result = Math.sin(op1) + "";
         else
             System.err.println("Operation non recognzied " + this.operation);
 
@@ -380,19 +395,16 @@ public class Calc{
             return "over";
         else if(s.indexOf("times") != -1)
             return "times";
+        else if(s.indexOf("log") != -1)
+            return "log";
+        else if(s.indexOf("sine") != -1)
+            return "sin";
+        else if(s.indexOf("cos") != -1)
+            return "cos";
         else {
             System.err.println("Cannot find operation for string " + s);
             return "-1";
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        Calc calc = new Calc();
-        while(true) {
-            calc.listenOnce();
-            System.out.println(calc);
-        }
-//      calc.stop();
     }
 
     public static String[] removeAnds(String[] arr) {
@@ -412,4 +424,14 @@ public class Calc{
         }
         return newArr;
     }
+
+    public static void main(String[] args) throws IOException {
+        Calc calc = new Calc();
+        while(true) {
+            calc.listenOnce();
+            System.out.println(calc);
+        }
+//      calc.stop();
+    }
+
 }
