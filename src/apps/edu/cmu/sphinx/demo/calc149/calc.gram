@@ -25,7 +25,7 @@ grammar calc;
 
 <number> = <dumbnum> | <unit>+;
 
-<var> = x | y | z;
+<var> = x | y | z | temp;
 
 <operand>  = (<number> | <var>) [ square | squared ];
 

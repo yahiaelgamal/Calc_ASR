@@ -141,6 +141,7 @@ public class Calc{
     private void handleStore(String s) {
         if(s.indexOf("last result") != -1) {
             this.lastAnswer = this.result;
+            vars.put("temp", Double.parseDouble(lastAnswer));
             this.operands = new String[] {"last result"};
         } else {
             String[] splitted = s.split(" ", 3);
@@ -203,11 +204,11 @@ public class Calc{
         else if(this.operation.equals("over") || this.operation.equals("/"))
             this.result = (op1 / op2) + "";
         else if(this.operation.equals("log"))
-            this.result = Math.log(op1) + "";
+            this.result = Math.log10(op1) + "";
         else if(this.operation.equals("cos"))
-            this.result = Math.cos(op1) + "";
+            this.result = Math.cos(op1*Math.PI/180) + "";
         else if(this.operation.equals("sin"))
-            this.result = Math.sin(op1) + "";
+            this.result = Math.sin(op1*Math.PI/180) + "";
         else {
             this.errorHappend = true;
             this.lastError = "Operation non recognzied " + this.operation;
