@@ -39,6 +39,8 @@ public class Calc{
     public String result;
     // A string representing the result (encoded as doubles)
     public String lastAnswer;
+    public String lastError;
+    public boolean errorHappend;
     private Recognizer recognizer;
     private Microphone microphone;
 
@@ -54,7 +56,7 @@ public class Calc{
         this.microphone.startRecording();
     }
     public Calc(boolean text){
-    	
+
     }
 
     public void listenOnce() {
@@ -62,12 +64,14 @@ public class Calc{
     }
 
     public void listenOnce(boolean text) {
+        this.errorHappend = false;
         if(text) {
             System.out.println("TYPE something to start. Press Ctrl-C to quit.\n");
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             try {
                 doStuff(br.readLine(), false);
             } catch (IOException e) {
+                lastError = e.getMessage();
                 e.printStackTrace();
             }
         } else {
@@ -80,13 +84,15 @@ public class Calc{
                 this.doStuff(resultText, false);
                 return ;
             } else {
-                System.out.println("I can't hear what you said.\n");
+                errorHappend = true;
+                lastError = "I can't hear what you said.\n";
+                System.err.println("I can't hear what you said.\n");
             }
         }
     }
-    
+
     public void doTextStuff(String s){
-    	doStuff(s, true);
+        doStuff(s, true);
     }
 
     public void stop() {
@@ -108,13 +114,13 @@ public class Calc{
         this.recognizedString = s;
         String operation = "";
         if(gui){
-        	operation = getOperationSymbole(s);
+            operation = getOperationSymbole(s);
         }else{
-        	operation = getOperation(s);
+            operation = getOperation(s);
         }
         this.operation =  operation;
         String[] operations = {"plus", "minus", "times", "over", "log", "sin", "cos", "+", "-", "/", "*"};
-        
+
         Arrays.sort(operations);
 
         if(operation.equals("store")) {
@@ -126,6 +132,8 @@ public class Calc{
         } else if(Arrays.binarySearch(operations, operation) >= 0) {
             handleOperation(s);
         } else {
+            this.errorHappend = true;
+            lastError = "No operation caught";
             System.err.println("No operation caught");
         }
     }
@@ -168,7 +176,7 @@ public class Calc{
         this.operands = newarr;
         this.makeOperation();
     }
-    
+
     private void handleOperationSymbols(String s) {
         String[] sarr = s.split("\\s*(+|-|/|*|log|sine|cos)\\s*");
         System.out.println(Arrays.toString(sarr));
@@ -212,17 +220,20 @@ public class Calc{
             this.result = Math.cos(op1) + "";
         else if(this.operation.equals("sin"))
             this.result = Math.sin(op1) + "";
-        else
+        else {
+            this.errorHappend = true;
+            this.lastError = "Operation non recognzied " + this.operation;
             System.err.println("Operation non recognzied " + this.operation);
+        }
 
     }
 
     private static boolean isDoubleParsable(String s) {
         return s.matches("[0-9]+(\\.[0-9]+)?");
     }
-    
+
     private static boolean isNumParsable(String s){
-    	return (s.matches("\\s*[0-9]+\\s*") || s.matches("\\s*[0-9]+(\\.[0-9]+)?\\s*"));
+        return (s.matches("\\s*[0-9]+\\s*") || s.matches("\\s*[0-9]+(\\.[0-9]+)?\\s*"));
     }
 
     private double buildNumber(String str) {
@@ -284,6 +295,8 @@ public class Calc{
                 words = new String[] {resArr[suffixIndex-2], resArr[suffixIndex-1]};
                 break;
             default:
+                errorHappend = true;
+                lastError = "#words between suffix is not 2, 3";
                 System.err.println("words between suffix is not 2, 3");
             }
             double beforeSuffix = translate(words);
@@ -305,7 +318,6 @@ public class Calc{
             remainingValue += translate(remainingWords);
             break;
         default:
-//          System.err.println("There are no remaining words" + remainingWordsCount);
             break;
         }
         return number + remainingValue;
@@ -329,7 +341,7 @@ public class Calc{
 
     private double translateOneWord(String str) {
         if(isNumParsable(str))
-        	return Double.parseDouble(str);
+            return Double.parseDouble(str);
         else if(str.equals("one"))
             return 1;
         else if(str.equals("two"))
@@ -392,9 +404,12 @@ public class Calc{
             return Math.E;
         else if(this.vars.containsKey(str))
             return this.vars.get(str);
-        else
+        else {
+            lastError = "non recognized number " + str;
+            errorHappend = true;
             System.err.println("non recognized number " + str);
             return 0;
+        }
     }
 
 
@@ -410,18 +425,20 @@ public class Calc{
                 return true;
         return false;
     }
-    
-    private static String getOperationSymbole(String s) {
-    	String [] symbols = {"+","-","/","*","log","sine","cos"};
-    	for(String sym: symbols){
-    		if(s.indexOf(sym) > -1)
-    			return sym;
-    	}
-    	System.err.println("Sym Cannot find operation for string " + s);
-        return "-1";		
+
+    private String getOperationSymbole(String s) {
+        String [] symbols = {"+","-","/","*","log","sine","cos"};
+        for(String sym: symbols){
+            if(s.indexOf(sym) > -1)
+                return sym;
+        }
+        errorHappend = true;
+        lastError = "Sym Cannot find operation for string " + s;
+        System.err.println("Sym Cannot find operation for string " + s);
+        return "-1";
     }
 
-    private static String getOperation(String s) {
+    private String getOperation(String s) {
         if(s.startsWith("store"))
             return "store";
         else if(s.startsWith("define"))
@@ -443,6 +460,8 @@ public class Calc{
         else if(s.indexOf("cos") != -1)
             return "cos";
         else {
+            errorHappend = true;
+            lastError = "Cannot find operation for string " + s;
             System.err.println("Cannot find operation for string " + s);
             return "-1";
         }
