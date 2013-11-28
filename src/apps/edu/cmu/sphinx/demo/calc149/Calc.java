@@ -164,7 +164,7 @@ public class Calc{
     }
 
     private void handleOperation(String s) {
-        String[] sarr = s.split("\\s*(plus|minus|over|times|log|sine|cos)\\s*");
+        String[] sarr = s.split("\\s*(plus|minus|over|times|log|sine|sin|cos|\\+|\\-|/|\\*)\\s*");
         System.out.println(Arrays.toString(sarr));
         if(sarr[0].equals("")) // speical case of <operator> <operand>
             sarr  = new String[] {sarr[1]};
@@ -172,20 +172,6 @@ public class Calc{
         String[] newarr = new String[sarr.length];
         for(int i = 0; i < sarr.length; i++) {
             newarr[i] = buildNumber(sarr[i].trim()) + "";
-        }
-        this.operands = newarr;
-        this.makeOperation();
-    }
-
-    private void handleOperationSymbols(String s) {
-        String[] sarr = s.split("\\s*(+|-|/|*|log|sine|cos)\\s*");
-        System.out.println(Arrays.toString(sarr));
-        if(sarr[0].equals("")) // speical case of <operator> <operand>
-            sarr  = new String[] {sarr[1]};
-
-        String[] newarr = new String[sarr.length];
-        for(int i = 0; i < sarr.length; i++) {
-            newarr[i] = sarr[i].trim() + "";
         }
         this.operands = newarr;
         this.makeOperation();
@@ -199,6 +185,8 @@ public class Calc{
         else
             op1 = vars.get(this.operands[0]);
 
+        System.out.println(operation);
+        System.out.println(Arrays.toString(operands));
         if(!(operation.equals("log") || operation.equals("sin") || operation.equals("cos"))) {
             if(isDoubleParsable(this.operands[1]))
                 op2 = Double.parseDouble(this.operands[1]);
@@ -427,7 +415,7 @@ public class Calc{
     }
 
     private String getOperationSymbole(String s) {
-        String [] symbols = {"+","-","/","*","log","sine","cos"};
+        String [] symbols = {"+","-","/","*","log","sin","cos"};
         for(String sym: symbols){
             if(s.indexOf(sym) > -1)
                 return sym;
