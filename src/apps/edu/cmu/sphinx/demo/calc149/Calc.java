@@ -125,9 +125,6 @@ public class Calc{
             handleRetrieve(s);
         } else if(Arrays.binarySearch(operations, operation) >= 0) {
             handleOperation(s);
-            // TODO why are you handling retrieve twice?!
-        } else if(operation.equals("retrieve")) {
-            handleRetrieve(s);
         } else {
             System.err.println("No operation caught");
         }
@@ -194,7 +191,7 @@ public class Calc{
         else
             op1 = vars.get(this.operands[0]);
 
-        if(!operation.equals("log") && operation.equals("sin") && operation.equals("cos")) {
+        if(!(operation.equals("log") || operation.equals("sin") || operation.equals("cos"))) {
             if(isDoubleParsable(this.operands[1]))
                 op2 = Double.parseDouble(this.operands[1]);
             else
@@ -472,7 +469,7 @@ public class Calc{
 //    public static void main(String[] args) throws IOException {
 //        Calc calc = new Calc();
 //        while(true) {
-//            calc.listenOnce();
+//            calc.listenOnce(true);
 //            System.out.println(calc);
 //        }
 //      //calc.stop();
