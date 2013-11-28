@@ -53,6 +53,9 @@ public class Calc{
         this.microphone = (Microphone) cm.lookup("microphone");
         this.microphone.startRecording();
     }
+    public Calc(boolean text){
+    	
+    }
 
     public void listenOnce() {
         listenOnce(false);
@@ -63,7 +66,7 @@ public class Calc{
             System.out.println("TYPE something to start. Press Ctrl-C to quit.\n");
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             try {
-                doStuff(br.readLine());
+                doStuff(br.readLine(), false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -74,12 +77,16 @@ public class Calc{
             if (result != null) {
                 String resultText = result.getBestFinalResultNoFiller();
                 System.out.println("You said: " + resultText + '\n');
-                this.doStuff(resultText);
+                this.doStuff(resultText, false);
                 return ;
             } else {
                 System.out.println("I can't hear what you said.\n");
             }
         }
+    }
+    
+    public void doTextStuff(String s){
+    	doStuff(s, true);
     }
 
     public void stop() {
@@ -97,11 +104,17 @@ public class Calc{
     }
 
     // TODO rename this method
-    private void doStuff(String s) {
+    public void doStuff(String s, boolean gui) {
         this.recognizedString = s;
-        String operation = getOperation(s);
+        String operation = "";
+        if(gui){
+        	operation = getOperationSymbole(s);
+        }else{
+        	operation = getOperation(s);
+        }
         this.operation =  operation;
-        String[] operations = {"plus", "minus", "times", "over", "log", "sin", "cos"};
+        String[] operations = {"plus", "minus", "times", "over", "log", "sin", "cos", "+", "-", "/", "*"};
+        
         Arrays.sort(operations);
 
         if(operation.equals("store")) {
@@ -112,6 +125,7 @@ public class Calc{
             handleRetrieve(s);
         } else if(Arrays.binarySearch(operations, operation) >= 0) {
             handleOperation(s);
+            // TODO why are you handling retrieve twice?!
         } else if(operation.equals("retrieve")) {
             handleRetrieve(s);
         } else {
@@ -157,6 +171,20 @@ public class Calc{
         this.operands = newarr;
         this.makeOperation();
     }
+    
+    private void handleOperationSymbols(String s) {
+        String[] sarr = s.split("\\s*(+|-|/|*|log|sine|cos)\\s*");
+        System.out.println(Arrays.toString(sarr));
+        if(sarr[0].equals("")) // speical case of <operator> <operand>
+            sarr  = new String[] {sarr[1]};
+
+        String[] newarr = new String[sarr.length];
+        for(int i = 0; i < sarr.length; i++) {
+            newarr[i] = sarr[i].trim() + "";
+        }
+        this.operands = newarr;
+        this.makeOperation();
+    }
 
     private void makeOperation() {
         double op1 = 0.0;
@@ -173,13 +201,13 @@ public class Calc{
                 op2 = vars.get(this.operands[1]);
         }
 
-        if(this.operation.equals("plus"))
+        if(this.operation.equals("plus") || this.operation.equals("+"))
             this.result = (op1 + op2) + "";
-        else if(this.operation.equals("minus"))
+        else if(this.operation.equals("minus") || this.operation.equals("-"))
             this.result = (op1 - op2) + "";
-        else if(this.operation.equals("times"))
+        else if(this.operation.equals("times") || this.operation.equals("*"))
             this.result = (op1 * op2) + "";
-        else if(this.operation.equals("over"))
+        else if(this.operation.equals("over") || this.operation.equals("/"))
             this.result = (op1 / op2) + "";
         else if(this.operation.equals("log"))
             this.result = Math.log(op1) + "";
@@ -194,6 +222,10 @@ public class Calc{
 
     private static boolean isDoubleParsable(String s) {
         return s.matches("[0-9]+(\\.[0-9]+)?");
+    }
+    
+    private static boolean isNumParsable(String s){
+    	return (s.matches("\\s*[0-9]+\\s*") || s.matches("\\s*[0-9]+(\\.[0-9]+)?\\s*"));
     }
 
     private double buildNumber(String str) {
@@ -299,7 +331,9 @@ public class Calc{
     }
 
     private double translateOneWord(String str) {
-        if(str.equals("one"))
+        if(isNumParsable(str))
+        	return Double.parseDouble(str);
+        else if(str.equals("one"))
             return 1;
         else if(str.equals("two"))
             return 2;
@@ -379,6 +413,16 @@ public class Calc{
                 return true;
         return false;
     }
+    
+    private static String getOperationSymbole(String s) {
+    	String [] symbols = {"+","-","/","*","log","sine","cos"};
+    	for(String sym: symbols){
+    		if(s.indexOf(sym) > -1)
+    			return sym;
+    	}
+    	System.err.println("Sym Cannot find operation for string " + s);
+        return "-1";		
+    }
 
     private static String getOperation(String s) {
         if(s.startsWith("store"))
@@ -425,13 +469,13 @@ public class Calc{
         return newArr;
     }
 
-    public static void main(String[] args) throws IOException {
-        Calc calc = new Calc();
-        while(true) {
-            calc.listenOnce();
-            System.out.println(calc);
-        }
-//      calc.stop();
-    }
+//    public static void main(String[] args) throws IOException {
+//        Calc calc = new Calc();
+//        while(true) {
+//            calc.listenOnce();
+//            System.out.println(calc);
+//        }
+//      //calc.stop();
+//    }
 
 }
