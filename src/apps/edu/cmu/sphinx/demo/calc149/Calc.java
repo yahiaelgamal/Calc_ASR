@@ -119,7 +119,8 @@ public class Calc{
             operation = getOperation(s);
         }
         this.operation =  operation;
-        String[] operations = {"plus", "minus", "times", "over", "log", "sin", "cos", "+", "-", "/", "*"};
+        String[] operations = {"plus", "minus", "times", "over", "log", "sin", 
+        		"cos", "tan", "+", "-", "/", "*"};
 
         Arrays.sort(operations);
 
@@ -165,7 +166,7 @@ public class Calc{
     }
 
     private void handleOperation(String s) {
-        String[] sarr = s.split("\\s*(plus|minus|over|times|log|sine|sin|cos|\\+|\\-|/|\\*)\\s*");
+        String[] sarr = s.split("\\s*(plus|minus|over|times|log|sine|sin|cos|tan|\\+|\\-|/|\\*)\\s*");
         System.out.println(Arrays.toString(sarr));
         if(sarr[0].equals("")) // speical case of <operator> <operand>
             sarr  = new String[] {sarr[1]};
@@ -188,7 +189,8 @@ public class Calc{
 
         System.out.println(operation);
         System.out.println(Arrays.toString(operands));
-        if(!(operation.equals("log") || operation.equals("sin") || operation.equals("cos"))) {
+        if(!(operation.equals("log") || operation.equals("sin") 
+        		|| operation.equals("cos") || operation.equals("tan"))) {
             if(isDoubleParsable(this.operands[1]))
                 op2 = Double.parseDouble(this.operands[1]);
             else
@@ -209,6 +211,8 @@ public class Calc{
             this.result = Math.cos(op1*Math.PI/180) + "";
         else if(this.operation.equals("sin"))
             this.result = Math.sin(op1*Math.PI/180) + "";
+        else if(this.operation.equals("tan"))
+            this.result = Math.tan(op1*Math.PI/180) + "";
         else {
             this.errorHappend = true;
             this.lastError = "Operation non recognzied " + this.operation;
@@ -416,7 +420,7 @@ public class Calc{
     }
 
     private String getOperationSymbole(String s) {
-        String [] symbols = {"+","-","/","*","log","sin","cos"};
+        String [] symbols = {"+","-","/","*","log","sin","cos", "tan"};
         for(String sym: symbols){
             if(s.indexOf(sym) > -1)
                 return sym;
