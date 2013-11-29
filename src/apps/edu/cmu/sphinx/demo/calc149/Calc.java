@@ -69,7 +69,7 @@ public class Calc{
             System.out.println("TYPE something to start. Press Ctrl-C to quit.\n");
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             try {
-                doStuff(br.readLine(), false);
+                makeComputations(br.readLine(), false);
             } catch (IOException e) {
                 lastError = e.getMessage();
                 e.printStackTrace();
@@ -81,7 +81,7 @@ public class Calc{
             if (result != null) {
                 String resultText = result.getBestFinalResultNoFiller();
                 System.out.println("You said: " + resultText + '\n');
-                this.doStuff(resultText, false);
+                this.makeComputations(resultText, false);
                 return ;
             } else {
                 errorHappend = true;
@@ -92,7 +92,7 @@ public class Calc{
     }
 
     public void doTextStuff(String s){
-        doStuff(s, true);
+        makeComputations(s, true);
     }
 
     public void stop() {
@@ -109,8 +109,7 @@ public class Calc{
         return s;
     }
 
-    // TODO rename this method
-    public void doStuff(String s, boolean gui) {
+    public void makeComputations(String s, boolean gui) {
         this.recognizedString = s;
         String operation = "";
         if(gui){
