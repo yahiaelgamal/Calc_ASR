@@ -37,8 +37,6 @@ public class Calc{
     public String recognizedString;
     // A string representing the result (encoded as doubles)
     public String result;
-    // A string representing the result (encoded as doubles)
-    public String lastAnswer;
     public String lastError;
     public boolean errorHappend;
     private Recognizer recognizer;
@@ -53,7 +51,6 @@ public class Calc{
         recognizer.allocate();
 
         this.microphone = (Microphone) cm.lookup("microphone");
-        this.microphone.startRecording();
     }
     public Calc(boolean text){
 
@@ -69,20 +66,22 @@ public class Calc{
             System.out.println("TYPE something to start. Press Ctrl-C to quit.\n");
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             try {
-                makeComputations(br.readLine(), false);
+                routeToHandler(br.readLine(), false);
             } catch (IOException e) {
                 lastError = e.getMessage();
                 e.printStackTrace();
             }
         } else {
+        	this.microphone.clear();
+            this.microphone.startRecording();
+
             System.out.println("Say something to start. Press Ctrl-C to quit.\n");
             Result result = recognizer.recognize();
 
-            if (result != null) {
+            if (result != null) {               
                 String resultText = result.getBestFinalResultNoFiller();
                 System.out.println("You said: " + resultText + '\n');
-                this.makeComputations(resultText, false);
-                return ;
+                this.routeToHandler(resultText, false);
             } else {
                 errorHappend = true;
                 lastError = "I can't hear what you said.\n";
@@ -92,7 +91,7 @@ public class Calc{
     }
 
     public void doTextStuff(String s){
-        makeComputations(s, true);
+        routeToHandler(s, true);
     }
 
     public void stop() {
@@ -105,11 +104,10 @@ public class Calc{
         s += "Operation " + this.operation;
         s += "\nOperands " + Arrays.toString(this.operands);
         s += "\nResult " + this.result;
-        s += "\nLastAnswer " + this.lastAnswer;
         return s;
     }
 
-    public void makeComputations(String s, boolean gui) {
+    public void routeToHandler(String s, boolean gui) {
         this.recognizedString = s;
         String operation = "";
         if(gui){
@@ -480,7 +478,7 @@ public class Calc{
 //    public static void main(String[] args) throws IOException {
 //        Calc calc = new Calc();
 //        while(true) {
-//            calc.listenOnce(true);
+//            calc.listenOnce();
 //            System.out.println(calc);
 //        }
 //      //calc.stop();
