@@ -138,8 +138,7 @@ public class Calc{
 
     private void handleStore(String s) {
         if(s.indexOf("last result") != -1) {
-            this.lastAnswer = this.result;
-            vars.put("temp", Double.parseDouble(lastAnswer));
+            vars.put("temp", Double.parseDouble(this.result));
             this.operands = new String[] {"last result"};
         } else {
             String[] splitted = s.split(" ", 3);
@@ -158,8 +157,10 @@ public class Calc{
 
     private void handleRetrieve(String s) {
         this.operands = new String[] {} ;
-        this.result = this.lastAnswer;
-        this.lastAnswer = this.result;
+        if(s.indexOf("last result") == -1) {
+        	String var = s.split(" ",2)[1];
+        	this.result = this.vars.get(var) + "";
+        }
     }
 
     private void handleOperation(String s) {

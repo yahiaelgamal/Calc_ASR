@@ -37,6 +37,8 @@ public <store2>  = store last result;
 
 public <retrieve> = retrieve last result;
 
+public <retrieve2> = retrieve <var>;
+
 <operator> = (plus | minus | over | times);
 <operator2> = (log | sine | cos | tan);
 
