@@ -17,9 +17,9 @@ grammar calc;
 
 <singular> = <unit> | <unitten> | <ten> | (<ten> <unit>);
 
-<dumbnum>  = (<singular> <suffix> <singular> <suffix> and <singular>) |
+<dumbnum>  = (<singular> <suffix> <singular> <suffix> [and] <singular>) |
              (<singular> <suffix> <singular> <suffix>) |
-             (<singular> <suffix> and <singular>) |
+             (<singular> <suffix> [and] <singular>) |
              (<singular> <suffix>) |
              <singular>;
 
