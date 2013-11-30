@@ -17,6 +17,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import sun.misc.Regexp;
 
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.recognizer.Recognizer;
@@ -174,12 +178,47 @@ public class Calc{
         if(sarr[0].equals("")) // speical case of <operator> <operand>
             sarr  = new String[] {sarr[1]};
 
-        String[] newarr = new String[sarr.length];
-        for(int i = 0; i < sarr.length; i++) {
-            newarr[i] = buildNumber(sarr[i].trim()) + "";
+
+        if(sarr.length == 3) { // BRACE YOURSELVES, A LOT OF HACKYNESS WILL HAPPEN
+            Pattern ops = Pattern.compile("(plus|minus|over|times|power|log|sine|sin|cos|tan|\\+|\\-|/|\\*)");
+            Matcher matcher = ops.matcher(s);
+            matcher.find();
+            String firstOp = s.substring(matcher.start(), matcher.end()+1);
+            matcher.find();
+            String secondOp = s.substring(matcher.start(), matcher.end()+1);
+
+            String[] newarr = new String[sarr.length];
+            for(int i = 0; i < sarr.length; i++) {
+                newarr[i] = buildNumber(sarr[i].trim()) + "";
+            }
+
+            if(isHigherPrescedence(firstOp, secondOp)) {
+                this.operands = new String[] {newarr[0], newarr[1]};
+                this.operation = firstOp.trim();
+                printA(operands);
+                this.makeOperation();
+                operands[0] = result;
+                operands[1] = newarr[2];
+                this.operation = secondOp.trim();
+                this.makeOperation();
+            }else {
+                this.operands = new String[] {newarr[1], newarr[2]};
+                this.operation = secondOp.trim();
+                this.makeOperation();
+                operands[1] = this.result;
+                operands[0] = newarr[0];
+                this.operation = firstOp.trim();
+                this.makeOperation();
+            }
+        }else {
+            String[] newarr = new String[sarr.length];
+            for(int i = 0; i < sarr.length; i++) {
+                newarr[i] = buildNumber(sarr[i].trim()) + "";
+            }
+            this.operands = newarr;
+            this.makeOperation();
         }
-        this.operands = newarr;
-        this.makeOperation();
+
     }
 
     private void makeOperation() {
@@ -190,8 +229,6 @@ public class Calc{
         else
             op1 = vars.get(this.operands[0]);
 
-//        System.out.println(operation);
-//        System.out.println(Arrays.toString(operands));
         if(!(operation.equals("log") || operation.equals("sin")
                 || operation.equals("cos") || operation.equals("tan"))) {
             if(isDoubleParsable(this.operands[1]))
@@ -210,28 +247,21 @@ public class Calc{
             this.result = Math.pow(op1, op2) + "";
         else if(this.operation.equals("over") || this.operation.equals("/"))
             this.result = (op1 / op2) + "";
-        else if(this.operation.equals("log"))
+        else if(this.operation.equals("log")) {
             this.result = Math.log10(op1) + "";
-        else if(this.operation.equals("cos"))
-            this.result = Math.cos(op1*Math.PI/180) + "";
-        else if(this.operation.equals("sin"))
-            this.result = Math.sin(op1*Math.PI/180) + "";
-        else if(this.operation.equals("tan"))
-            this.result = Math.tan(op1*Math.PI/180) + "";
+        }
+//        else if(this.operation.equals("cos"))
+//            this.result = Math.cos(op1*Math.PI/180) + "";
+//        else if(this.operation.equals("sin"))
+//            this.result = Math.sin(op1*Math.PI/180) + "";
+//        else if(this.operation.equals("tan"))
+//            this.result = Math.tan(op1*Math.PI/180) + "";
         else {
             this.errorHappend = true;
             this.lastError = "Operation non recognzied " + this.operation;
             System.err.println("Operation non recognzied " + this.operation);
         }
 
-    }
-
-    private static boolean isDoubleParsable(String s) {
-        return s.matches("[0-9]+(\\.[0-9]+)?");
-    }
-
-    private static boolean isNumParsable(String s){
-        return (s.matches("\\s*[0-9]+\\s*") || s.matches("\\s*[0-9]+(\\.[0-9]+)?\\s*"));
     }
 
     private double buildNumber(String str) {
@@ -276,7 +306,6 @@ public class Calc{
 
             int wordsBetweenSuffix = suffixIndex - lastSuffixIndex;
             String[] words = null;
-//          System.out.println("WORDS BETWEEN SUFFIX " + wordsBetweenSuffix);
             switch (wordsBetweenSuffix) {
             case 2:
                 words = new String[] {resArr[suffixIndex-1]};
@@ -391,7 +420,6 @@ public class Calc{
         else if(str.equals("ninety"))
             return 90;
         else if(this.vars.containsKey(str)) {
-//          System.out.println(str + this.vars.get(str));
             return this.vars.get(str);
         }
         else {
@@ -401,7 +429,6 @@ public class Calc{
             return 0;
         }
     }
-
 
     private static boolean isSuffix(String str) {
         return str.equals("hundred") || str.equals("thousand");
@@ -443,14 +470,14 @@ public class Calc{
             return "over";
         else if(s.indexOf("times") != -1)
             return "times";
-        else if(s.indexOf("power") != -1)
-            return "power";
         else if(s.indexOf("log") != -1)
             return "log";
         else if(s.indexOf("sine") != -1)
             return "sin";
         else if(s.indexOf("cos") != -1)
             return "cos";
+        else if(s.indexOf("power") != -1) // ORDER MATTERS
+            return "power";
         else {
             errorHappend = true;
             lastError = "Cannot find operation for string " + s;
@@ -475,6 +502,18 @@ public class Calc{
             }
         }
         return newArr;
+    }
+
+    private static boolean isDoubleParsable(String s) {
+        return s.matches("[0-9]+(\\.[0-9]+)?");
+    }
+
+    private static boolean isNumParsable(String s){
+        return (s.matches("\\s*[0-9]+\\s*") || s.matches("\\s*[0-9]+(\\.[0-9]+)?\\s*"));
+    }
+
+    public static void getOps(String s) {
+        String[] sarr = s.split("\\s*(plus|minus|over|times|power|log|sine|sin|cos|tan|\\+|\\-|/|\\*)\\s*");
     }
 
     public static void test() {
@@ -523,8 +562,75 @@ public class Calc{
 
     }
 
+    public static void test2() {
+        Calc calc = new Calc(false);
+        calc.routeToHandler("store x twenty", false);
+        calc.routeToHandler("store y fourty", false);
+        calc.routeToHandler("x plus y", false);
+        if(calc.result.equals("60.0"))
+            System.out.println("PASS 1");
+        else
+            System.out.println("FAIL 1: " + calc.result);
+
+        calc.routeToHandler("store x twenty", false);
+        calc.routeToHandler("store y fourty", false);
+        calc.routeToHandler("x plus y plus one thousand", false);
+        if(calc.result.equals("1060.0"))
+            System.out.println("PASS 2");
+        else
+            System.out.println("FAIL 2: " + calc.result);
+
+        calc.routeToHandler("store x seventy", false);
+        calc.routeToHandler("x minus fifty times e", false);
+        if(calc.result.equals("-65.91409142295225"))
+            System.out.println("PASS 3");
+        else
+            System.out.println("FAIL 3: " + calc.result);
+
+        calc.routeToHandler("store x one two", false);
+        calc.routeToHandler("store y three", false);
+        calc.routeToHandler("x plus y power four", false);
+        if(calc.result.equals("93.0"))
+            System.out.println("PASS 4");
+        else
+            System.out.println("FAIL 4: " + calc.result);
+
+        calc.routeToHandler("store r nine", false);
+        calc.routeToHandler("pie times r power two", false);
+        if(calc.result.indexOf("254.46900494") != -1)
+            System.out.println("PASS 5");
+        else
+            System.out.println("FAIL 5: " + calc.result);
+
+        calc.routeToHandler("pie plus twelve over  three", false);
+        if(calc.result.indexOf("7.141592") != -1)
+            System.out.println("PASS 6");
+        else
+            System.out.println("FAIL 6: " + calc.result);
+
+    }
+    public static boolean isHigherPrescedence(String op1, String op2) {
+        int op1Value = getPrescedence(op1);
+        int op2Value = getPrescedence(op2);
+        return op1Value > op2Value;
+    }
+    public static int getPrescedence(String op) {
+        op = op.trim();
+        int opValue = 0;
+        if(op.matches("(plus|minus|\\+|\\-)"))
+            opValue = 1;
+        if(op.matches("(times|over|\\*|\\/)"))
+            opValue = 2;
+        if(op.matches("(power|\\^)"))
+            opValue = 3;
+        return opValue;
+    }
     public static void main(String[] args) throws IOException {
         test();
+        test2();
+    }
+    public static void printA(Object[] arr) {
+        System.out.println(Arrays.toString(arr));
     }
 //    public static void main(String[] args) throws IOException {
 //        Calc calc = new Calc();

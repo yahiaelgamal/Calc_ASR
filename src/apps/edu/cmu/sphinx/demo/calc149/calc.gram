@@ -25,7 +25,7 @@ grammar calc;
 
 <number> = <dumbnum> | <unit>+;
 
-<var> = x | y | z | temp | pie | e;
+<var> = a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z | temp | pie | e;
 
 public <operand>  = (<number> | <var>) [ power <number> ];
 
@@ -43,5 +43,5 @@ public <retrieve2> = retrieve <var>;
 <operator2> = (log | sine | cos | tan);
 
 public <operation>  = <operand> <operator> <operand>;
-public <operation2>  = <operator2> <operand>;
+public <operation2>  = <operator2> <operand> [power <number>];
 
