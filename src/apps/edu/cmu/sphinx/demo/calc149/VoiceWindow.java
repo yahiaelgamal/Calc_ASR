@@ -1,5 +1,6 @@
 package edu.cmu.sphinx.demo.calc149;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,7 +12,7 @@ public class VoiceWindow {
 		final JFrame frame = new JFrame("Voice Mode");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
 		  
-        JPanel panel = (JPanel)frame.getContentPane();
+        final JPanel panel = (JPanel)frame.getContentPane();
         
         panel.setLayout(null);
 		
@@ -28,11 +29,12 @@ public class VoiceWindow {
 		          }
 		      );
 		
-		JLabel label1 = new JLabel("Press the button and start speaking!");
+		JLabel label1 = new JLabel("Press \"Listen\" and start speaking!");
 		JLabel label2 = new JLabel("Say for example: one plus one or sine pie");
 		JLabel resultLabel = new JLabel("You said");
 		final JLabel you = new JLabel("");
 		JLabel r = new JLabel("result:");
+		final JLabel listening = new JLabel("Listening");
 		final JLabel label3 = new JLabel("");
 		
 		label1.setSize(300, 20);
@@ -47,15 +49,31 @@ public class VoiceWindow {
 		label3.setLocation(10, 185);
 		you.setSize(300, 20);
 		resultLabel.setLocation(10, 100);
+		listening.setSize(100, 20);
+		listening.setLocation(100, 100);
+		listening.setVisible(false);
 		
-		JButton button2 = new JButton("Start");
+		JButton button2 = new JButton("Listen");
 		button2.setBounds(200, 100, 80, 30);
 		button2.addActionListener(
 					new ActionListener() {
 		            public void actionPerformed(ActionEvent e) {
+		            	listening.setVisible(false);
+		            	label3.setText("");
 		            	calc.listenOnce();
 		            	you.setText(calc.recognizedString);
+		            	label3.setForeground(Color.blue);
 		            	label3.setText(calc.result);
+		            	if(calc.errorHappend){
+		            		listening.setVisible(true);
+		            		listening.setForeground(Color.red);
+		            		listening.setText("Error occured!");
+		            		label3.setForeground(Color.red);
+		            		label3.setText(calc.lastError);
+		            	}else{
+		            		listening.setVisible(false);
+		            	}
+		            	
 		            }
 				}
 		      );
@@ -65,6 +83,7 @@ public class VoiceWindow {
 		panel.add(label2);
 		panel.add(label1);
 		panel.add(you);
+		panel.add(listening);
 		panel.add(resultLabel);
 		panel.add(label3);
 		panel.add(r);
