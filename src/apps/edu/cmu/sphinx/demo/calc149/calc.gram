@@ -25,7 +25,7 @@ grammar calc;
 
 <number> = <dumbnum> | <unit>+;
 
-<var> = a | b | c | d | e | f | g | h | i | j | k | l | m | n | p | q | r | s | t | u | v | w | x | y | z | temp | pie | e;
+<var> = r | x | y | z | temp | pie | e;
 
 <operand>  = (<number> | <var>) [ power <number> ];
 

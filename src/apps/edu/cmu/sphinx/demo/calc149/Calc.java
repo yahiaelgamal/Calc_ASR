@@ -171,7 +171,7 @@ public class Calc{
     }
 
     private void handleOperation(String s) {
-        String[] sarr = s.split("\\s*(plus|minus|over|times|power|log|sine|sin|cos|tan|\\+|\\-|/|\\*)\\s*");
+        String[] sarr = s.split("\\s*(plus|minus|over|times|power|log|sine|sin|cos|tan|\\+|\\-|/|\\*|\\^)\\s*");
         for(int i = 0; i < sarr.length; i++) {  // DON'T ASK (ask log if you really want to
         	if(sarr[i].equals(""))
         		sarr[i] = sarr[i+1]; // NEVER OUT OF BOUNDS
@@ -179,7 +179,7 @@ public class Calc{
 
 
         if(sarr.length == 3) { // BRACE YOURSELVES, A LOT OF HACKYNESS WILL HAPPEN
-            Pattern ops = Pattern.compile("(plus|minus|over|times|power|log|sine|sin|cos|tan|\\+|\\-|/|\\*)");
+            Pattern ops = Pattern.compile("(plus|minus|over|times|power|log|sine|sin|cos|tan|\\+|\\-|/|\\*|\\^)");
             Matcher matcher = ops.matcher(s);
             matcher.find();
             String firstOp = s.substring(matcher.start(), matcher.end()+1);
@@ -245,15 +245,14 @@ public class Calc{
             this.result = Math.pow(op1, op2) + "";
         else if(this.operation.equals("over") || this.operation.equals("/"))
             this.result = (op1 / op2) + "";
-        else if(this.operation.equals("log")) {
+        else if(this.operation.equals("log"))
             this.result = Math.log10(op1) + "";
-        }
-//        else if(this.operation.equals("cos"))
-//            this.result = Math.cos(op1*Math.PI/180) + "";
-//        else if(this.operation.equals("sin"))
-//            this.result = Math.sin(op1*Math.PI/180) + "";
-//        else if(this.operation.equals("tan"))
-//            this.result = Math.tan(op1*Math.PI/180) + "";
+        else if(this.operation.equals("cos"))
+            this.result = Math.cos(op1*Math.PI/180) + "";
+        else if(this.operation.equals("sin"))
+            this.result = Math.sin(op1*Math.PI/180) + "";
+        else if(this.operation.equals("tan"))
+            this.result = Math.tan(op1*Math.PI/180) + "";
         else {
             this.errorHappend = true;
             this.lastError = "Operation non recognzied " + this.operation;
@@ -646,7 +645,7 @@ public class Calc{
         if(op.matches("(power|\\^)"))
             opValue = 3;
         
-        if(op.matches("(log|sin|cos|tan|\\^)"))
+        if(op.matches("(log|sin|cos|tan)"))
             opValue = 4;
         return opValue;
     }
