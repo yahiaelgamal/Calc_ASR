@@ -25,9 +25,9 @@ grammar calc;
 
 <number> = <dumbnum> | <unit>+;
 
-<var> = x | y | z | temp;
+<var> = x | y | z | temp | pie | e;
 
-<operand>  = (<number> | <var>) [ square | squared ];
+public <operand>  = (<number> | <var>) [ power <number> ];
 
 public <define> = define variable <var>;
 
@@ -39,8 +39,9 @@ public <retrieve> = retrieve last result;
 
 public <retrieve2> = retrieve <var>;
 
-<operator> = (plus | minus | over | times);
+<operator> = (plus | minus | over | times| power);
 <operator2> = (log | sine | cos | tan);
 
 public <operation>  = <operand> <operator> <operand>;
 public <operation2>  = <operator2> <operand>;
+
