@@ -1,5 +1,6 @@
 package edu.cmu.sphinx.demo.calc149;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -56,9 +57,20 @@ public class TextWindow implements MouseListener{
 		button2.addActionListener(
 					new ActionListener() {
 		            public void actionPerformed(ActionEvent e) {
+		            	label3.setText("");
 		            	if(textfield.getText().length() > 0){
-		                    calc.doTextStuff(textfield.getText());
+		                    try{
+		            		calc.doTextStuff(textfield.getText());
+		            		label3.setForeground(Color.blue);
 		                    label3.setText(calc.result);
+		                    if(calc.errorHappend){
+		                    	label3.setForeground(Color.red);
+		                    	label3.setText(calc.lastError);
+		                    }
+		                    }catch(Exception exp){
+		                    	label3.setForeground(Color.red);
+		                    	label3.setText("Error occured");
+		                    }
 		              }
 		            }
 				}
