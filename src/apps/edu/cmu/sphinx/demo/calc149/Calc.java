@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sun.misc.Regexp;
-
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
@@ -174,9 +172,10 @@ public class Calc{
 
     private void handleOperation(String s) {
         String[] sarr = s.split("\\s*(plus|minus|over|times|power|log|sine|sin|cos|tan|\\+|\\-|/|\\*)\\s*");
-//        System.out.println(Arrays.toString(sarr));
-        if(sarr[0].equals("")) // speical case of <operator> <operand>
-            sarr  = new String[] {sarr[1]};
+        for(int i = 0; i < sarr.length; i++) {  // DON'T ASK (ask log if you really want to
+        	if(sarr[i].equals(""))
+        		sarr[i] = sarr[i+1]; // NEVER OUT OF BOUNDS
+        }
 
 
         if(sarr.length == 3) { // BRACE YOURSELVES, A LOT OF HACKYNESS WILL HAPPEN
@@ -195,7 +194,6 @@ public class Calc{
             if(isHigherPrescedence(firstOp, secondOp)) {
                 this.operands = new String[] {newarr[0], newarr[1]};
                 this.operation = firstOp.trim();
-                printA(operands);
                 this.makeOperation();
                 operands[0] = result;
                 operands[1] = newarr[2];
@@ -381,7 +379,7 @@ public class Calc{
             return 8;
         else if(str.equals("nine"))
             return 9;
-        else if(str.equals("zero"))
+        else if(str.equals("zero") || str.equals("oh"))
             return 0;
         else if(str.equals("eleven"))
             return 11;
@@ -423,7 +421,7 @@ public class Calc{
             return this.vars.get(str);
         }
         else {
-            lastError = "non recognized number " + str;
+            lastError = "non recognized variable " + str;
             errorHappend = true;
             System.err.println("non recognized number " + str);
             return 0;
@@ -510,10 +508,6 @@ public class Calc{
 
     private static boolean isNumParsable(String s){
         return (s.matches("\\s*[0-9]+\\s*") || s.matches("\\s*[0-9]+(\\.[0-9]+)?\\s*"));
-    }
-
-    public static void getOps(String s) {
-        String[] sarr = s.split("\\s*(plus|minus|over|times|power|log|sine|sin|cos|tan|\\+|\\-|/|\\*)\\s*");
     }
 
     public static void test() {
@@ -609,6 +603,34 @@ public class Calc{
             System.out.println("FAIL 6: " + calc.result);
 
     }
+    
+    public static void test3() {
+        Calc calc = new Calc(false);
+        calc.routeToHandler("log one thousand power three", false);
+        if(calc.result.startsWith("27") )
+            System.out.println("PASS 1");
+        else
+            System.out.println("FAIL 1: " + calc.result);
+        
+        calc.routeToHandler("one plus log one hundred", false);
+        if(calc.result.startsWith("3") )
+            System.out.println("PASS 2");
+        else
+            System.out.println("FAIL 2: " + calc.result);
+        
+        calc.routeToHandler("log one hundred plus one", false);
+        if(calc.result.startsWith("3") )
+            System.out.println("PASS 3");
+        else
+            System.out.println("FAIL 3: " + calc.result);
+
+        calc.routeToHandler("log one hundred power three", false);
+        if(calc.result.startsWith("8") )
+            System.out.println("PASS 4");
+        else
+            System.out.println("FAIL 4: " + calc.result);
+
+    }
     public static boolean isHigherPrescedence(String op1, String op2) {
         int op1Value = getPrescedence(op1);
         int op2Value = getPrescedence(op2);
@@ -623,11 +645,15 @@ public class Calc{
             opValue = 2;
         if(op.matches("(power|\\^)"))
             opValue = 3;
+        
+        if(op.matches("(log|sin|cos|tan|\\^)"))
+            opValue = 4;
         return opValue;
     }
     public static void main(String[] args) throws IOException {
         test();
         test2();
+    	test3();
     }
     public static void printA(Object[] arr) {
         System.out.println(Arrays.toString(arr));
