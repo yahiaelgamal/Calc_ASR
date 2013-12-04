@@ -37,8 +37,8 @@ public class Calc{
     public String operation;
     // a raw string returned from the recognizer
     public String recognizedString;
-    // A string representing the result (encoded as doubles)
-    public String result;
+    // A double representing the result (encoded as doubles)
+    public double result;
     public String lastError;
     public boolean errorHappend;
     private Recognizer recognizer;
@@ -145,14 +145,14 @@ public class Calc{
 
     private void handleStore(String s) {
         if(s.indexOf("last result") != -1) {
-            vars.put("temp", Double.parseDouble(this.result));
+            vars.put("temp", this.result);
             this.operands = new String[] {"last result"};
         } else {
             String[] splitted = s.split(" ", 3);
             this.operands = new String[] {splitted[splitted.length-2],
                     buildNumber(splitted[splitted.length-1]) + ""};
             this.vars.put(this.operands[0], Double.parseDouble(this.operands[1]));
-            this.result = this.operands[1];
+            this.result = Double.parseDouble(this.operands[1]);
         }
     }
 
@@ -166,7 +166,7 @@ public class Calc{
         this.operands = new String[] {} ;
         if(s.indexOf("last result") == -1) {
             String var = s.split(" ",2)[1];
-            this.result = this.vars.get(var) + "";
+            this.result = this.vars.get(var);
         }
     }
 
@@ -195,7 +195,7 @@ public class Calc{
                 this.operands = new String[] {newarr[0], newarr[1]};
                 this.operation = firstOp.trim();
                 this.makeOperation();
-                operands[0] = result;
+                operands[0] = result + "";
                 operands[1] = newarr[2];
                 this.operation = secondOp.trim();
                 this.makeOperation();
@@ -203,7 +203,7 @@ public class Calc{
                 this.operands = new String[] {newarr[1], newarr[2]};
                 this.operation = secondOp.trim();
                 this.makeOperation();
-                operands[1] = this.result;
+                operands[1] = this.result + "";
                 operands[0] = newarr[0];
                 this.operation = firstOp.trim();
                 this.makeOperation();
@@ -236,23 +236,23 @@ public class Calc{
         }
 
         if(this.operation.equals("plus") || this.operation.equals("+"))
-            this.result = (op1 + op2) + "";
+            this.result = (op1 + op2);
         else if(this.operation.equals("minus") || this.operation.equals("-"))
-            this.result = (op1 - op2) + "";
+            this.result = (op1 - op2);
         else if(this.operation.equals("times") || this.operation.equals("*"))
-            this.result = (op1 * op2) + "";
+            this.result = (op1 * op2);
         else if(this.operation.equals("power") || this.operation.equals("^"))
-            this.result = Math.pow(op1, op2) + "";
+            this.result = Math.pow(op1, op2);
         else if(this.operation.equals("over") || this.operation.equals("/"))
-            this.result = (op1 / op2) + "";
+            this.result = (op1 / op2);
         else if(this.operation.equals("log"))
-            this.result = Math.log10(op1) + "";
+            this.result = Math.log10(op1);
         else if(this.operation.equals("cos"))
-            this.result = Math.cos(op1*Math.PI/180) + "";
+            this.result = Math.cos(op1*Math.PI/180);
         else if(this.operation.equals("sin"))
-            this.result = Math.sin(op1*Math.PI/180) + "";
+            this.result = Math.sin(op1*Math.PI/180);
         else if(this.operation.equals("tan"))
-            this.result = Math.tan(op1*Math.PI/180) + "";
+            this.result = Math.tan(op1*Math.PI/180);
         else {
             this.errorHappend = true;
             this.lastError = "Operation non recognzied " + this.operation;
@@ -512,43 +512,43 @@ public class Calc{
     public static void test() {
         Calc calc = new Calc(false);
         calc.routeToHandler("four thousand five hundred and sixty seven plus three thousand two hundred and fourteen", false);
-        if(calc.result.equals("7781.0"))
+        if((calc.result + "").equals("7781.0"))
             System.out.println("PASS 1");
         else
             System.out.println("FAIL 1: " + calc.result);
 
         calc.routeToHandler("two power twenty two", false);
-        if(calc.result.equals("4194304.0"))
+        if((calc.result + "").equals("4194304.0"))
             System.out.println("PASS 2");
         else
             System.out.println("FAIL 2: " + calc.result);
 
         calc.routeToHandler("five hundred and sixty two times three thousand one hundred and two", false);
-        if(calc.result.equals("1743324.0"))
+        if((calc.result + "").equals("1743324.0"))
             System.out.println("PASS 3");
         else
             System.out.println("FAIL 3: " + calc.result);
 
         calc.routeToHandler("fourty five minus twelve",false);
-        if(calc.result.equals("33.0"))
+        if((calc.result + "").equals("33.0"))
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);
 
         calc.routeToHandler("fourty five minus twelve",false);
-        if(calc.result.equals("33.0"))
+        if((calc.result + "").equals("33.0"))
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);
 
         calc.routeToHandler("log five thousand four hundred and ten",false);
-        if(calc.result.equals("3.7331972651065692"))
+        if((calc.result + "").equals("3.7331972651065692"))
             System.out.println("PASS 5");
         else
             System.out.println("FAIL 5: " + calc.result);
 
         calc.routeToHandler("e power one two",false);
-        if(calc.result.equals("162754.79141900383"))
+        if((calc.result + "").equals("162754.79141900383"))
             System.out.println("PASS 6");
         else
             System.out.println("FAIL 6: " + calc.result);
@@ -560,7 +560,7 @@ public class Calc{
         calc.routeToHandler("store x twenty", false);
         calc.routeToHandler("store y fourty", false);
         calc.routeToHandler("x plus y", false);
-        if(calc.result.equals("60.0"))
+        if((calc.result + "").equals("60.0"))
             System.out.println("PASS 1");
         else
             System.out.println("FAIL 1: " + calc.result);
@@ -568,14 +568,14 @@ public class Calc{
         calc.routeToHandler("store x twenty", false);
         calc.routeToHandler("store y fourty", false);
         calc.routeToHandler("x plus y plus one thousand", false);
-        if(calc.result.equals("1060.0"))
+        if((calc.result + "").equals("1060.0"))
             System.out.println("PASS 2");
         else
             System.out.println("FAIL 2: " + calc.result);
 
         calc.routeToHandler("store x seventy", false);
         calc.routeToHandler("x minus fifty times e", false);
-        if(calc.result.equals("-65.91409142295225"))
+        if((calc.result + "").equals("-65.91409142295225"))
             System.out.println("PASS 3");
         else
             System.out.println("FAIL 3: " + calc.result);
@@ -583,20 +583,20 @@ public class Calc{
         calc.routeToHandler("store x one two", false);
         calc.routeToHandler("store y three", false);
         calc.routeToHandler("x plus y power four", false);
-        if(calc.result.equals("93.0"))
+        if((calc.result + "").equals("93.0"))
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);
 
         calc.routeToHandler("store r nine", false);
         calc.routeToHandler("pie times r power two", false);
-        if(calc.result.indexOf("254.46900494") != -1)
+        if((calc.result + "").indexOf("254.46900494") != -1)
             System.out.println("PASS 5");
         else
             System.out.println("FAIL 5: " + calc.result);
 
         calc.routeToHandler("pie plus twelve over  three", false);
-        if(calc.result.indexOf("7.141592") != -1)
+        if((calc.result + "").indexOf("7.141592") != -1)
             System.out.println("PASS 6");
         else
             System.out.println("FAIL 6: " + calc.result);
@@ -606,25 +606,25 @@ public class Calc{
     public static void test3() {
         Calc calc = new Calc(false);
         calc.routeToHandler("log one thousand power three", false);
-        if(calc.result.startsWith("27") )
+        if((calc.result + "").startsWith("27") )
             System.out.println("PASS 1");
         else
             System.out.println("FAIL 1: " + calc.result);
         
         calc.routeToHandler("one plus log one hundred", false);
-        if(calc.result.startsWith("3") )
+        if((calc.result + "").startsWith("3") )
             System.out.println("PASS 2");
         else
             System.out.println("FAIL 2: " + calc.result);
         
         calc.routeToHandler("log one hundred plus one", false);
-        if(calc.result.startsWith("3") )
+        if((calc.result + "").startsWith("3") )
             System.out.println("PASS 3");
         else
             System.out.println("FAIL 3: " + calc.result);
 
         calc.routeToHandler("log one hundred power three", false);
-        if(calc.result.startsWith("8") )
+        if((calc.result + "").startsWith("8") )
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);
@@ -657,13 +657,4 @@ public class Calc{
     public static void printA(Object[] arr) {
         System.out.println(Arrays.toString(arr));
     }
-//    public static void main(String[] args) throws IOException {
-//        Calc calc = new Calc();
-//        while(true) {
-//            calc.listenOnce();
-//            System.out.println(calc);
-//        }
-//      //calc.stop();
-//    }
-
 }

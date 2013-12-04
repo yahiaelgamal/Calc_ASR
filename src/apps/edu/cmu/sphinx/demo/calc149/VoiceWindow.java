@@ -63,7 +63,7 @@ public class VoiceWindow {
 		            	calc.listenOnce();
 		            	you.setText(calc.recognizedString);
 		            	label3.setForeground(Color.blue);
-		            	label3.setText(calc.result);
+		            	label3.setText(calc.result + "");
 		            	if(calc.errorHappend){
 		            		listening.setVisible(true);
 		            		listening.setForeground(Color.red);

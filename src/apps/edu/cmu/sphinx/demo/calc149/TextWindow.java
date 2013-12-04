@@ -62,7 +62,7 @@ public class TextWindow implements MouseListener{
 		                    try{
 		            		calc.doTextStuff(textfield.getText());
 		            		label3.setForeground(Color.blue);
-		                    label3.setText(calc.result);
+		                    label3.setText(calc.result + "");
 		                    if(calc.errorHappend){
 		                    	label3.setForeground(Color.red);
 		                    	label3.setText(calc.lastError);
