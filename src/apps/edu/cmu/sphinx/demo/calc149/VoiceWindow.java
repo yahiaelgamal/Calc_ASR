@@ -33,7 +33,7 @@ public class VoiceWindow {
 		JLabel label2 = new JLabel("Say for example: one plus one or sine pie");
 		JLabel resultLabel = new JLabel("You said");
 		final JLabel you = new JLabel("");
-		JLabel r = new JLabel("result:");
+		JLabel r = new JLabel("Result:");
 		final JLabel listening = new JLabel("Listening");
 		final JLabel label3 = new JLabel("");
 		

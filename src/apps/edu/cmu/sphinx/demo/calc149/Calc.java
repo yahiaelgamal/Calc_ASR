@@ -622,8 +622,8 @@ public class Calc{
     	System.out.println("++++++++++++++++++++++++");
         Calc calc = new Calc(false);
         
-        calc.routeToHandler("log 1");
-        if(calc.result == Math.log(1))
+        calc.routeToHandler("log 8");
+        if(calc.result == Math.log10(8))
             System.out.println("PASS 1");
         else
             System.out.println("FAIL 1: " + calc.result);
@@ -643,6 +643,13 @@ public class Calc{
         calc.routeToHandler("store x 20");
         calc.routeToHandler("x + 30");
         if(calc.result == 50)
+            System.out.println("PASS 4");
+        else
+            System.out.println("FAIL 4: " + calc.result);
+        
+        calc.routeToHandler("store x 20");
+        calc.routeToHandler("x + log 2");
+        if(calc.result == 20 + Math.log10(20))
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);

@@ -39,7 +39,7 @@ public class TextWindow implements MouseListener{
 		textfield.setLocation(10, 100);
 		
 		JLabel label1 = new JLabel("Please enter your formula here");
-		JLabel label2 = new JLabel("For example: 1 + 1 or log 22");
+		JLabel label2 = new JLabel("For example: 1 + 1 + 2 or log 22");
 		JLabel resultLabel = new JLabel("Result:");
 		final JLabel label3 = new JLabel("");
 		
