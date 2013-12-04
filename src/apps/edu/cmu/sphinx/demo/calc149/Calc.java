@@ -117,7 +117,7 @@ public class Calc{
         this.recognizedString = s;
         String operation = "";
         if(gui){
-            operation = getOperationSymbole(s);
+            operation = getOperationSymbol(s);
         }else{
             operation = getOperation(s);
         }
@@ -316,8 +316,7 @@ public class Calc{
                 System.err.println("words between suffix is not 2, 3");
             }
             double beforeSuffix = translate(words);
-            boolean isHundred = resArr[suffixIndex].equals("hundred") ||
-                    resArr[suffixIndex].equals("hundreds");
+            boolean isHundred = resArr[suffixIndex].startsWith("hundred"); // also valid for "hundreds"
             int  factor = isHundred  ? 100 : 1000;
             number += beforeSuffix * factor;
         }
@@ -428,19 +427,19 @@ public class Calc{
     }
 
     private static boolean isSuffix(String str) {
-        return str.equals("hundred") || str.equals("thousand");
+        return str.startsWith("hundred") || str.startsWith("thousand");
     }
 
     private static boolean isDigit(String str) {
         String[] digits  = {"one", "two", "three", "four", "five", "six", "seven",
-                "eight", "nine", "zero"};
+                "eight", "nine", "zero", "oh"};
         for(String digit : digits)
             if(digit.equals(str))
                 return true;
         return false;
     }
 
-    private String getOperationSymbole(String s) {
+    private String getOperationSymbol(String s) {
         String [] symbols = {"+","-","/","*","^","log","sin","cos", "tan"};
         for(String sym: symbols){
             if(s.indexOf(sym) > -1)
