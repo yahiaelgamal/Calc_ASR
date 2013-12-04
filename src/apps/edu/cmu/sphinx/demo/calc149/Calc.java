@@ -72,7 +72,7 @@ public class Calc{
             System.out.println("TYPE something to start. Press Ctrl-C to quit.\n");
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             try {
-                routeToHandler(br.readLine(), false);
+                routeToHandler(br.readLine());
             } catch (IOException e) {
                 lastError = e.getMessage();
                 e.printStackTrace();
@@ -87,7 +87,7 @@ public class Calc{
             if (result != null) {
                 String resultText = result.getBestFinalResultNoFiller();
                 System.out.println("You said: " + resultText + '\n');
-                this.routeToHandler(resultText, false);
+                this.routeToHandler(resultText);
             } else {
                 errorHappend = true;
                 lastError = "I can't hear what you said.\n";
@@ -97,7 +97,7 @@ public class Calc{
     }
 
     public void doTextStuff(String s){
-        routeToHandler(s, true);
+        routeToHandler(s);
     }
 
     public void stop() {
@@ -113,14 +113,10 @@ public class Calc{
         return s;
     }
 
-    public void routeToHandler(String s, boolean gui) {
+    public void routeToHandler(String s) {
         this.recognizedString = s;
         String operation = "";
-        if(gui){
-            operation = getOperationSymbol(s);
-        }else{
-            operation = getOperation(s);
-        }
+        operation = getOperation(s);
         this.operation =  operation;
         String[] operations = {"plus", "minus", "times", "power",  "over",
                 "log", "sin", "cos", "tan", "+", "-", "/", "*", "^"};
@@ -264,21 +260,25 @@ public class Calc{
     private double buildNumber(String str) {
         String resArr[] = str.split(" ");
         resArr = removeAnds(resArr);
-        boolean allDigits = true;
+        boolean allDigitsWord = true;
         for(String s : resArr){
-            if(!isDigit(s)) {
-                allDigits = false;
+            if(!isDigitWord(s)) {
+            	allDigitsWord = false;
                 break;
             }
         }
+        
+        boolean allDigits = str.matches("[0-9]+");
 
         double number = 0;
-        if(allDigits) {
+        if(allDigitsWord) {
             String resString = "";
             for(String s : resArr) {
                 resString += (int) translateOneWord(s);
             }
             number = Double.parseDouble(resString);
+        }else if (allDigits){
+        	return Double.parseDouble(str);
         }else {
             number = handleWithSuffix(resArr);
         }
@@ -430,25 +430,13 @@ public class Calc{
         return str.startsWith("hundred") || str.startsWith("thousand");
     }
 
-    private static boolean isDigit(String str) {
+    private static boolean isDigitWord(String str) {
         String[] digits  = {"one", "two", "three", "four", "five", "six", "seven",
                 "eight", "nine", "zero", "oh"};
         for(String digit : digits)
             if(digit.equals(str))
                 return true;
         return false;
-    }
-
-    private String getOperationSymbol(String s) {
-        String [] symbols = {"+","-","/","*","^","log","sin","cos", "tan"};
-        for(String sym: symbols){
-            if(s.indexOf(sym) > -1)
-                return sym;
-        }
-        errorHappend = true;
-        lastError = "Sym Cannot find operation for string " + s;
-        System.err.println("Sym Cannot find operation for string " + s);
-        return "-1";
     }
 
     private String getOperation(String s) {
@@ -458,13 +446,13 @@ public class Calc{
             return "define";
         else if(s.startsWith("retrieve"))
             return "retrieve";
-        else if(s.indexOf("plus") != -1)
+        else if(s.indexOf("plus") != -1 || s.indexOf("+") != -1)
             return "plus";
-        else if(s.indexOf("minus") != -1)
+        else if(s.indexOf("minus") != -1 || s.indexOf("-") != -1)
             return "minus";
-        else if(s.indexOf("over") != -1)
+        else if(s.indexOf("over") != -1 || s.indexOf("/") != -1)
             return "over";
-        else if(s.indexOf("times") != -1)
+        else if(s.indexOf("times") != -1 || s.indexOf("*") != -1)
             return "times";
         else if(s.indexOf("log") != -1)
             return "log";
@@ -472,7 +460,7 @@ public class Calc{
             return "sin";
         else if(s.indexOf("cos") != -1)
             return "cos";
-        else if(s.indexOf("power") != -1) // ORDER MATTERS
+        else if(s.indexOf("power") != -1 || s.indexOf("^") != -1) // ORDER MATTERS
             return "power";
         else {
             errorHappend = true;
@@ -510,43 +498,43 @@ public class Calc{
 
     public static void test() {
         Calc calc = new Calc(false);
-        calc.routeToHandler("four thousand five hundred and sixty seven plus three thousand two hundred and fourteen", false);
+        calc.routeToHandler("four thousand five hundred and sixty seven plus three thousand two hundred and fourteen");
         if((calc.result + "").equals("7781.0"))
             System.out.println("PASS 1");
         else
             System.out.println("FAIL 1: " + calc.result);
 
-        calc.routeToHandler("two power twenty two", false);
+        calc.routeToHandler("two power twenty two");
         if((calc.result + "").equals("4194304.0"))
             System.out.println("PASS 2");
         else
             System.out.println("FAIL 2: " + calc.result);
 
-        calc.routeToHandler("five hundred and sixty two times three thousand one hundred and two", false);
+        calc.routeToHandler("five hundred and sixty two times three thousand one hundred and two");
         if((calc.result + "").equals("1743324.0"))
             System.out.println("PASS 3");
         else
             System.out.println("FAIL 3: " + calc.result);
 
-        calc.routeToHandler("fourty five minus twelve",false);
+        calc.routeToHandler("fourty five minus twelve");
         if((calc.result + "").equals("33.0"))
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);
 
-        calc.routeToHandler("fourty five minus twelve",false);
+        calc.routeToHandler("fourty five minus twelve");
         if((calc.result + "").equals("33.0"))
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);
 
-        calc.routeToHandler("log five thousand four hundred and ten",false);
+        calc.routeToHandler("log five thousand four hundred and ten");
         if((calc.result + "").equals("3.7331972651065692"))
             System.out.println("PASS 5");
         else
             System.out.println("FAIL 5: " + calc.result);
 
-        calc.routeToHandler("e power one two",false);
+        calc.routeToHandler("e power one two");
         if((calc.result + "").equals("162754.79141900383"))
             System.out.println("PASS 6");
         else
@@ -556,45 +544,45 @@ public class Calc{
 
     public static void test2() {
         Calc calc = new Calc(false);
-        calc.routeToHandler("store x twenty", false);
-        calc.routeToHandler("store y fourty", false);
-        calc.routeToHandler("x plus y", false);
+        calc.routeToHandler("store x twenty");
+        calc.routeToHandler("store y fourty");
+        calc.routeToHandler("x plus y");
         if((calc.result + "").equals("60.0"))
             System.out.println("PASS 1");
         else
             System.out.println("FAIL 1: " + calc.result);
 
-        calc.routeToHandler("store x twenty", false);
-        calc.routeToHandler("store y fourty", false);
-        calc.routeToHandler("x plus y plus one thousand", false);
+        calc.routeToHandler("store x twenty");
+        calc.routeToHandler("store y fourty");
+        calc.routeToHandler("x plus y plus one thousand");
         if((calc.result + "").equals("1060.0"))
             System.out.println("PASS 2");
         else
             System.out.println("FAIL 2: " + calc.result);
 
-        calc.routeToHandler("store x seventy", false);
-        calc.routeToHandler("x minus fifty times e", false);
+        calc.routeToHandler("store x seventy");
+        calc.routeToHandler("x minus fifty times e");
         if((calc.result + "").equals("-65.91409142295225"))
             System.out.println("PASS 3");
         else
             System.out.println("FAIL 3: " + calc.result);
 
-        calc.routeToHandler("store x one two", false);
-        calc.routeToHandler("store y three", false);
-        calc.routeToHandler("x plus y power four", false);
+        calc.routeToHandler("store x one two");
+        calc.routeToHandler("store y three");
+        calc.routeToHandler("x plus y power four");
         if((calc.result + "").equals("93.0"))
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);
 
-        calc.routeToHandler("store r nine", false);
-        calc.routeToHandler("pie times r power two", false);
+        calc.routeToHandler("store r nine");
+        calc.routeToHandler("pie times r power two");
         if((calc.result + "").indexOf("254.46900494") != -1)
             System.out.println("PASS 5");
         else
             System.out.println("FAIL 5: " + calc.result);
 
-        calc.routeToHandler("pie plus twelve over  three", false);
+        calc.routeToHandler("pie plus twelve over  three");
         if((calc.result + "").indexOf("7.141592") != -1)
             System.out.println("PASS 6");
         else
@@ -604,31 +592,62 @@ public class Calc{
     
     public static void test3() {
         Calc calc = new Calc(false);
-        calc.routeToHandler("log one thousand power three", false);
+        calc.routeToHandler("log one thousand power three");
         if((calc.result + "").startsWith("27") )
             System.out.println("PASS 1");
         else
             System.out.println("FAIL 1: " + calc.result);
         
-        calc.routeToHandler("one plus log one hundred", false);
+        calc.routeToHandler("one plus log one hundred");
         if((calc.result + "").startsWith("3") )
             System.out.println("PASS 2");
         else
             System.out.println("FAIL 2: " + calc.result);
         
-        calc.routeToHandler("log one hundred plus one", false);
+        calc.routeToHandler("log one hundred plus one");
         if((calc.result + "").startsWith("3") )
             System.out.println("PASS 3");
         else
             System.out.println("FAIL 3: " + calc.result);
 
-        calc.routeToHandler("log one hundred power three", false);
+        calc.routeToHandler("log one hundred power three");
         if((calc.result + "").startsWith("8") )
             System.out.println("PASS 4");
         else
             System.out.println("FAIL 4: " + calc.result);
 
     }
+    
+    public static void test4() {
+    	System.out.println("++++++++++++++++++++++++");
+        Calc calc = new Calc(false);
+        
+        calc.routeToHandler("log 1");
+        if(calc.result == Math.log(1))
+            System.out.println("PASS 1");
+        else
+            System.out.println("FAIL 1: " + calc.result);
+        
+        calc.routeToHandler("1 + 2");
+        if(calc.result == (1+2))
+            System.out.println("PASS 2");
+        else
+            System.out.println("FAIL 2: " + calc.result);
+        
+        calc.routeToHandler("store x 20");
+        if(calc.result == 20 && calc.vars.get("x") == 20)
+            System.out.println("PASS 3");
+        else
+            System.out.println("FAIL 3: " + calc.result);
+        
+        calc.routeToHandler("store x 20");
+        calc.routeToHandler("x + 30");
+        if(calc.result == 50)
+            System.out.println("PASS 4");
+        else
+            System.out.println("FAIL 4: " + calc.result);
+    }
+
     public static boolean isHigherPrescedence(String op1, String op2) {
         int op1Value = getPrescedence(op1);
         int op2Value = getPrescedence(op2);
@@ -652,6 +671,7 @@ public class Calc{
         test();
         test2();
     	test3();
+    	test4();
     }
     public static void printA(Object[] arr) {
         System.out.println(Arrays.toString(arr));
